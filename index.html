@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d0f13">
+  <meta name="description" content="Sách lật báo tường lớp 12A1 – 6 trang, lật giở như sách thật trên máy tính và điện thoại.">
+  <title>Báo tường lớp 12A1</title>
+
+  <!-- Biểu tượng nhỏ trên tab trình duyệt (không cần file riêng) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230d0f13'/%3E%3Cpath d='M22 30h24v46H22zM54 30h24v46H54z' fill='%23d8a95b'/%3E%3C/svg%3E">
+
+  <!-- Tải trước ảnh bìa để trang mở nhanh hơn -->
+  <link rel="preload" as="image" href="images/page-1.webp">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- ================= PHẦN ĐẦU TRANG ================= -->
+    <header class="header">
+      <div class="header__text">
+        <p class="header__eyebrow">Sách lật</p>
+        <h1 class="header__title">Báo tường lớp 12A1</h1>
+      </div>
+      <p class="header__hint">
+        Dùng <kbd>←</kbd> <kbd>→</kbd> để lật trang · kéo chuột hoặc bấm vào góc trang
+      </p>
+    </header>
+
+    <!-- ================= SÂN KHẤU CHỨA SÁCH ================= -->
+    <main class="stage" id="stage">
+      <div class="stage__inner" id="stageInner">
+        <!-- Khung sách: JS sẽ tính kích thước và dựng các trang vào đây -->
+        <div class="book-shell" id="bookShell">
+          <!-- Vệt tối nhẹ ở gáy sách, tạo cảm giác 2 trang nằm sát nhau -->
+          <div class="book-shell__spine" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <!-- Màn hình chờ khi đang tải ảnh -->
+      <div class="loader" id="loader" role="status" aria-live="polite">
+        <span class="loader__spinner" aria-hidden="true"></span>
+        <span>Đang mở sách…</span>
+      </div>
+
+      <noscript>
+        <p class="noscript">Trình duyệt của bạn đang tắt JavaScript. Hãy bật JavaScript để xem sách lật.</p>
+      </noscript>
+    </main>
+
+    <!-- ================= THANH CÔNG CỤ ================= -->
+    <footer class="toolbar">
+      <div class="toolbar__group">
+        <button class="btn btn--nav" id="prevBtn" type="button" aria-label="Trang trước">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="btn__label">Trước</span>
+        </button>
+
+        <div class="counter" aria-live="polite">
+          <span class="counter__label">Trang</span>
+          <strong class="counter__now" id="pageNow">1 / 6</strong>
+        </div>
+
+        <button class="btn btn--nav" id="nextBtn" type="button" aria-label="Trang sau">
+          <span class="btn__label">Sau</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="toolbar__group toolbar__group--tools">
+        <button class="btn btn--icon" id="zoomBtn" type="button" aria-label="Phóng to trang" title="Phóng to (Z)">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M11 8v6M8 11h6M16.5 16.5L21 21" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="btn__label">Phóng to</span>
+        </button>
+
+        <button class="btn btn--icon" id="fsBtn" type="button" aria-label="Bật toàn màn hình" title="Toàn màn hình (F)">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="btn__label">Toàn màn hình</span>
+        </button>
+
+        <button class="btn btn--icon" id="downloadBtn" type="button" aria-label="Tải ảnh chất lượng cao" title="Tải ảnh (D)">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 4v11M7 10l5 5 5-5M5 20h14" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="btn__label">Tải ảnh</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ================= HỘP THOẠI PHÓNG TO ================= -->
+  <dialog class="modal modal--zoom" id="zoomDialog" aria-labelledby="zoomLabel">
+    <div class="zoom__bar">
+      <div class="zoom__nav">
+        <button class="zoom__arrow" id="zoomPrev" type="button" aria-label="Trang trước">‹</button>
+        <span class="zoom__label" id="zoomLabel">Trang 1</span>
+        <button class="zoom__arrow" id="zoomNext" type="button" aria-label="Trang sau">›</button>
+      </div>
+
+      <div class="zoom__actions">
+        <button class="zoom__btn" id="zoomOut" type="button" aria-label="Thu nhỏ">−</button>
+        <span class="zoom__level" id="zoomLevel" aria-live="polite">100%</span>
+        <button class="zoom__btn" id="zoomIn" type="button" aria-label="Phóng lớn">+</button>
+        <button class="zoom__btn zoom__btn--text" id="zoomReset" type="button">Vừa khung</button>
+        <button class="zoom__btn zoom__btn--text" id="zoomClose" type="button">Đóng</button>
+      </div>
+    </div>
+
+    <div class="zoom__viewport" id="zoomViewport">
+      <img class="zoom__img" id="zoomImg" alt="" draggable="false">
+      <span class="zoom__loading" id="zoomLoading" aria-hidden="true"></span>
+    </div>
+  </dialog>
+
+  <!-- ================= HỘP THOẠI TẢI ẢNH ================= -->
+  <dialog class="modal modal--sheet" id="downloadDialog" aria-labelledby="downloadTitle">
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="downloadTitle">Tải ảnh chất lượng cao</h2>
+      <button class="sheet__close" type="button" data-close aria-label="Đóng">✕</button>
+    </div>
+    <p class="sheet__note">
+      Mỗi trang là một file JPG độ phân giải gốc, phù hợp để in ấn. Bấm vào trang bạn muốn tải.
+    </p>
+    <ul class="download-list" id="downloadList"><!-- JS sinh danh sách tại đây --></ul>
+    <button class="sheet__done" type="button" data-close>Đóng</button>
+  </dialog>
+
+  <script src="lib/page-flip.browser.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
